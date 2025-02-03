@@ -5,6 +5,7 @@ import { CONSTANTS } from '../constants';
 import { Debris } from '../objects/debris';
 import { Player } from '../objects/Player';
 import { Ground } from '../objects/ground';
+import { Enemy } from '../objects/enemy';
 
 export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
@@ -15,6 +16,8 @@ export class Game extends Scene {
     player:Player;
     platforms: Platform[] = [];
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
+
+    enemies: Enemy[] = [];
 
     constructor() {
         super('Game');
@@ -45,14 +48,17 @@ export class Game extends Scene {
         
         
 
-
-
-
-
-        this.input.once('pointerdown', () => {
-
-            // this.scene.start('GameOver');
-
+        this.spawnEnemies();  // Spawn enemies after platforms are created
+        
+        this.enemies.forEach(enemy => {
+            if (enemy.enemy) {
+                this.platforms.forEach(platform => {
+                    this.physics.add.collider(enemy.enemy!, platform.platform);
+                });
+            }
+            this.physics.add.collider(this.player.player, enemy.enemy!, () => {
+                this.scene.start('GameOver');
+            });
         });
     }
 
@@ -94,7 +100,8 @@ export class Game extends Scene {
         {
             this.player.player.anims.play(CONSTANTS.PLAYER_IDLE, true);
         }
-            
+        
+        this.enemies.forEach(enemy => enemy.update());
     }
 
 
@@ -115,5 +122,15 @@ export class Game extends Scene {
     spawnPlayer() {
         this.player = new Player(this, CONSTANTS.WINDOW_WIDTH / 2 , CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE * 2, CONSTANTS.PLAYER_IDLE);
         this.player.player.anims.play(CONSTANTS.PLAYER_IDLE);
+    }
+
+    spawnEnemies() {
+        this.platforms.forEach(platform => {
+            if (Math.random() < 0.2) {
+                const platformTile = platform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;
+                const enemy = new Enemy(this, platformTile.x, platformTile.y - CONSTANTS.TERRAIN_TILE_SIZE);
+                this.enemies.push(enemy);
+            }
+        });
     }
 }

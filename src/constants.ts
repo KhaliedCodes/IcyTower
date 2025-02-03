@@ -7,6 +7,8 @@ export const CONSTANTS = {
     PLATFORM_TEXTURE_PATH: 'Platforms/Terrain.png',
     DEBRIS: 'debris' ,
     DEBRIS_TEXTURE_PATH: 'Platforms/Rock Head/Idle.png',
+    ENEMY: 'enemy',
+    ENEMY_TEXTURE_PATH: 'Platforms/Saw/On (38x38).png',
     PLAYER_IDLE: 'playerIdle',
     PLAYER_RUN: 'playerRun',
     PLAYER_JUMP: 'playerJump',

@@ -33,6 +33,7 @@ export class MainMenu extends Scene {
         this.startButton.on('pointerdown', () => {
             this.scene.start('Game');
         });
+        
 
         this.optionsButton = this.add.text(this.scale.width / 2, 700, 'Settings', {
             fontFamily: 'Verdana', fontSize: 36, color: '#ffffff',
