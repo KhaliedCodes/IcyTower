@@ -3,6 +3,7 @@ import { Platform } from '../objects/platform';
 import { Utils } from '../utils/utils';
 import { CONSTANTS } from '../constants';
 import { Debris } from '../objects/debris';
+import { Ground } from '../objects/ground';
 
 export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
@@ -18,6 +19,7 @@ export class Game extends Scene {
     create() {
         this.camera = this.cameras.main;
         this.camera.setBackgroundColor(0x00ff00);
+        new Ground(this, 0, CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE, CONSTANTS.PLATFORM, 2);
         this.spawnPlatforms();
         this.spawnPlatforms();
         this.spawnPlatforms();
