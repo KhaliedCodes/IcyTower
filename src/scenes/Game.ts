@@ -26,7 +26,8 @@ export class Game extends Scene {
 
     create() {
         this.camera = this.cameras.main;
-        this.camera.setBackgroundColor(0x00ff00);
+        const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
+        bg.setDisplaySize(this.scale.width, this.scale.height);
         this.spawnPlayer();
         let ground = new Ground(this, 0, CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE, CONSTANTS.PLATFORM, 2);
         this.platforms.push(ground);
