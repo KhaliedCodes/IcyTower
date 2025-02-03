@@ -31,6 +31,8 @@ export class Preloader extends Scene {
 
         this.load.image('logo', 'EcoTowerLogo.png');
         this.load.spritesheet(CONSTANTS.PLATFORM, CONSTANTS.PLATFORM_TEXTURE_PATH, { frameWidth: CONSTANTS.TERRAIN_TILE_SIZE, frameHeight: CONSTANTS.TERRAIN_TILE_SIZE });
+        this.load.spritesheet(CONSTANTS.ENEMY, CONSTANTS.ENEMY_TEXTURE_PATH, { frameWidth: 38, frameHeight: 38 });
+
         this.load.spritesheet(CONSTANTS.PLAYER_IDLE, CONSTANTS.PLAYER_IDLE_TEXTURE_PATH, { frameWidth: CONSTANTS.PLAYER_TILE_SIZE, frameHeight: CONSTANTS.PLAYER_TILE_SIZE });
         this.load.spritesheet(CONSTANTS.PLAYER_RUN, CONSTANTS.PLAYER_RUN_TEXTURE_PATH, { frameWidth: CONSTANTS.PLAYER_TILE_SIZE, frameHeight: CONSTANTS.PLAYER_TILE_SIZE });
         this.load.spritesheet(CONSTANTS.PLAYER_JUMP, CONSTANTS.PLAYER_JUMP_TEXTURE_PATH, { frameWidth: CONSTANTS.PLAYER_TILE_SIZE, frameHeight: CONSTANTS.PLAYER_TILE_SIZE });

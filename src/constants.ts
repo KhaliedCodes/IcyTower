@@ -5,6 +5,8 @@ export const CONSTANTS = {
     PLAYER_TILE_SIZE: 32,
     PLATFORM: 'platform',
     PLATFORM_TEXTURE_PATH: 'Platforms/Terrain.png',
+    ENEMY: 'enemy',
+    ENEMY_TEXTURE_PATH: 'Platforms/Saw/On (38x38).png',
     PLAYER_IDLE: 'playerIdle',
     PLAYER_RUN: 'playerRun',
     PLAYER_JUMP: 'playerJump',
