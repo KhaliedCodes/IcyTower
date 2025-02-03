@@ -27,6 +27,10 @@ export class Game extends Scene {
 
     enemies: Enemy[] = [];
     scoreText: Phaser.GameObjects.Text;
+    coyoteTime: number = 0;
+    coyoteTimeMax: number = 200;
+    jumpBuffer: number = 0;
+    jumpBufferMax: number = 200;
 
     constructor() {
         super('Game');
@@ -110,7 +114,7 @@ export class Game extends Scene {
             this.player.player.setVelocityX(0);
         }
         
-        if (this.cursor?.up && Phaser.Input.Keyboard.JustDown(this.cursor.up)) {
+        if ((this.cursor?.up && Phaser.Input.Keyboard.JustDown(this.cursor.up)) || (this.cursor?.space && Phaser.Input.Keyboard.JustDown(this.cursor.space))) {
             if (this.player.player.body?.touching.down) {
                 // First Jump from Ground
                 this.player.player.setVelocityY(-330);
@@ -120,16 +124,55 @@ export class Game extends Scene {
                 if (this.hasDoubleJump) {
                     this.canDoubleJump = true;  // Enable double jump after first jump
                 }
-            } else if (this.canDoubleJump) {
+        
+                // Reset Coyote Time & Jump Buffer on a normal jump
+                this.coyoteTime = 0;
+                this.jumpBuffer = 0;
+            } 
+            else if (this.coyoteTime > 0) {
+                // Coyote Time Jump (allows jump just after leaving the ground)
+                this.player.player.setVelocityY(-330);
+                this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+                this.coyoteTime = 0;
+                this.jumpBuffer = 0;
+                if (this.hasDoubleJump) {
+                    this.canDoubleJump = true;  // Enable double jump after first jump
+                }
+            } 
+            else if (this.canDoubleJump) {
                 // Double Jump Mid-Air
                 this.player.player.setVelocityY(-230);
                 this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
                 this.canDoubleJump = false;  // Disable double jump after using it
+            } 
+            else {
+                // Store jump input in Jump Buffer
+                this.jumpBuffer = this.jumpBufferMax;
             }
         }
+        else
+        {
+            this.jumpBuffer -= delta;
+        }
         
+        // Reset double jump when player lands
         if (this.player.player.body?.touching.down && this.hasDoubleJump) {
-            this.canDoubleJump = true;  // Reset double jump when the player lands
+            this.canDoubleJump = true;
+        }
+        
+        // Coyote Time (Jump allowed slightly after falling)
+        if (this.player.player.body?.touching.down) {
+            this.coyoteTime = this.coyoteTimeMax; // Reset when grounded
+        } else {
+            this.coyoteTime -= delta; // Decrease when in air
+        }
+        
+        // Jump Buffer (Allow late jumps just before landing)
+        if (this.jumpBuffer > 0 && this.coyoteTime > 0) {
+            this.player.player.setVelocityY(-330);
+            this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+            this.jumpBuffer = 0; // Reset buffer after jump
+            this.coyoteTime = 0; // Reset coyote time
         }
         
 
