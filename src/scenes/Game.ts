@@ -2,6 +2,7 @@ import { Input, Scene, Types } from 'phaser';
 import { Platform } from '../objects/platform';
 import { Utils } from '../utils/utils';
 import { CONSTANTS } from '../constants';
+import { Debris } from '../objects/debris';
 import { Player } from '../objects/Player';
 import { Ground } from '../objects/ground';
 import { Enemy } from '../objects/enemy';
@@ -11,6 +12,7 @@ export class Game extends Scene {
     background: Phaser.GameObjects.Image;
     msg_text: Phaser.GameObjects.Text;
     platformSpawnHeight: number = CONSTANTS.TERRAIN_TILE_SIZE * 4;
+    debrisManager: Debris;
     player:Player;
     platforms: Platform[] = [];
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -32,6 +34,16 @@ export class Game extends Scene {
         this.spawnPlatforms();
         this.spawnPlatforms();
         this.spawnPlatforms();
+        this.debrisManager = new Debris(this);
+        this.time.addEvent({
+            delay: 2000,
+            callback: () => {
+                const x = Phaser.Math.Between(100, CONSTANTS.WINDOW_WIDTH - 100);
+                const y = 0;  // Spawn at the top of the screen
+                this.debrisManager.spawnDebris(this, x, y);
+            },
+            loop: true
+        });
         this.cursor = this.input?.keyboard?.createCursorKeys();
         
         
