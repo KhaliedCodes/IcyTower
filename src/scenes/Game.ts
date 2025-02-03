@@ -9,7 +9,7 @@ export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
     background: Phaser.GameObjects.Image;
     msg_text: Phaser.GameObjects.Text;
-    platformSpawnHeight: number = CONSTANTS.TERRAIN_TILE_SIZE * 4;
+    platformSpawnHeight: number = CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE*4;
     player:Player;
     platforms: Platform[] = [];
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -82,10 +82,18 @@ export class Game extends Scene {
         {
             this.player.player.anims.play(CONSTANTS.PLAYER_IDLE, true);
         }
-        
-        this.camera.setPosition(0,Math.max(CONSTANTS.WINDOW_HEIGHT-CONSTANTS.TERRAIN_TILE_SIZE*3-(this.player.player.body?.position.y??0),this.camera.centerY-this.camera.height/2));
-        
-        if(this.camera.centerY-this.camera.height/2+(this.player.player.body?.position.y??0)>CONSTANTS.WINDOW_HEIGHT)
+
+        if (CONSTANTS.WINDOW_HEIGHT-CONSTANTS.TERRAIN_TILE_SIZE*5-(this.player.player.body?.position.y??0)>-this.camera.scrollY)
+        {
+            this.camera.scrollY = -CONSTANTS.WINDOW_HEIGHT+CONSTANTS.TERRAIN_TILE_SIZE*5+(this.player.player.body?.position.y??0);
+        }
+
+        if (this.camera.scrollY - CONSTANTS.TERRAIN_TILE_SIZE*2 < this.platformSpawnHeight)
+        {
+            this.spawnPlatforms();
+        }
+
+        if(-this.camera.scrollY+(this.player.player.body?.position.y??0)>CONSTANTS.WINDOW_HEIGHT)
         {
             this.scene.start('GameOver');
         }
@@ -104,7 +112,7 @@ export class Game extends Scene {
         const platform2 = new Platform(this, secondPlatformSpawnX, this.platformSpawnHeight, CONSTANTS.PLATFORM, 2);
         this.platforms.push(platform2);
         this.physics.add.collider(this.player.player, platform2.platform);
-        this.platformSpawnHeight += CONSTANTS.TERRAIN_TILE_SIZE * 3;
+        this.platformSpawnHeight -= CONSTANTS.TERRAIN_TILE_SIZE * 3;
     }
     spawnPlayer() {
         this.player = new Player(this, CONSTANTS.WINDOW_WIDTH / 2 , CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE * 2, CONSTANTS.PLAYER_IDLE);
