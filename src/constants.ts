@@ -18,6 +18,8 @@ export const CONSTANTS = {
     GAME_OVER_AUDIO: 'gmOver',
     GAME_OVER_AUDIO_TEXTURE_PATH: 'Audio/gameOver.mp3',
     PLATFORM: 'platform',
+    UNSTABLE_PLATFORM: 'unstablePlatform',
+    UNSTABLE_PLATFORM_PATH: 'Platforms/UnstableTerrain.png',
     PLATFORM_TEXTURE_PATH: 'Platforms/Terrain.png',
     DEBRIS: 'debris' ,
     DEBRIS_TEXTURE_PATH: 'Platforms/Rock Head/Idle.png',
@@ -33,4 +35,5 @@ export const CONSTANTS = {
     PLAYER_FALL_TEXTURE_PATH: 'Character/Ninja_Frog/Fall.png',
     POWER_UP: 'powerUp',
     POWER_UP_TEXTURE_PATH: 'Platforms/Spiked Ball/Chain.png',
+    SCORE: 0
 }

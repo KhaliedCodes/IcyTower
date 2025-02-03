@@ -5,6 +5,7 @@ export class GameOver extends Scene
 {
     camera: Phaser.Cameras.Scene2D.Camera;
     gameover_text : Phaser.GameObjects.Text;
+    score_text : Phaser.GameObjects.Text;
     mainButton: GameObjects.Text;
     exitButton: GameObjects.Text;
 
@@ -37,7 +38,10 @@ export class GameOver extends Scene
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         });
+
         this.gameover_text.setOrigin(0.5);
+        this.score_text = this.add.text(CONSTANTS.WINDOW_WIDTH/2, CONSTANTS.WINDOW_HEIGHT/2+100, 'score : ' + CONSTANTS.SCORE, { fontSize: '32px', color:'000000' ,stroke: '#ffffff', strokeThickness: 8, align: 'center'});
+        this.score_text.setOrigin(0.5);
 
         this.mainButton = this.add.text(this.scale.width / 2, 600, 'Main Menu', {
             fontFamily: 'Verdana', fontSize: 36, color: '#ffffff',
