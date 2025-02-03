@@ -67,8 +67,14 @@ export class Game extends Scene {
 
         
     }
-
+    
     update(time: number, delta: number): void {
+        if ((this.player.player.body?.position.x??0)<0){
+            this.player.player.setX(0+CONSTANTS.PLAYER_TILE_SIZE/2);
+        }
+        if ((this.player.player.body?.position.x??0)>CONSTANTS.WINDOW_WIDTH-CONSTANTS.PLAYER_TILE_SIZE){
+            this.player.player.setX(CONSTANTS.WINDOW_WIDTH-CONSTANTS.PLAYER_TILE_SIZE/2);
+        }
         // const playerRunning = this.sound.add(CONSTANTS.PLAYER_RUN_AUDIO);
         if (this.cursor?.left.isDown) {
             // if(!playerRunning.isPlaying){
