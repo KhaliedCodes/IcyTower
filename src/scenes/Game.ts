@@ -84,7 +84,11 @@ export class Game extends Scene {
         }
         
         this.camera.setPosition(0,Math.max(CONSTANTS.WINDOW_HEIGHT-CONSTANTS.TERRAIN_TILE_SIZE*3-(this.player.player.body?.position.y??0),this.camera.centerY-this.camera.height/2));
-            
+        
+        if(this.camera.centerY-this.camera.height/2+(this.player.player.body?.position.y??0)>CONSTANTS.WINDOW_HEIGHT)
+        {
+            this.scene.start('GameOver');
+        }
     }
 
 
