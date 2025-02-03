@@ -1,4 +1,5 @@
 import { Scene ,GameObjects } from 'phaser';
+import { CONSTANTS } from '../constants';
 
 export class GameOver extends Scene
 {
@@ -15,6 +16,19 @@ export class GameOver extends Scene
 
     create ()
     {
+        const mainMenuMusic = this.sound.get(CONSTANTS.BG_MUSIC_AUDIO);
+        if (mainMenuMusic && mainMenuMusic.isPlaying) {
+            mainMenuMusic.stop();
+        }
+
+        let gameOverMusic = this.sound.get(CONSTANTS.GAME_OVER_AUDIO);
+        if (!gameOverMusic) {
+            gameOverMusic = this.sound.add(CONSTANTS.GAME_OVER_AUDIO, { loop: true, volume: 0.7 });
+        }
+        if (!gameOverMusic.isPlaying) {
+            gameOverMusic.play();
+        }
+
         this.camera = this.cameras.main
         this.camera.setBackgroundColor(0xff0000);
 
