@@ -13,6 +13,7 @@ export class Game extends Scene {
     player:Player;
     platforms: Platform[] = [];
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
+    scoreText: Phaser.GameObjects.Text;
 
     constructor() {
         super('Game');
@@ -30,6 +31,7 @@ export class Game extends Scene {
         this.spawnPlatforms();
         this.spawnPlatforms();
         this.cursor = this.input?.keyboard?.createCursorKeys();
+        this.scoreText = this.add.text(50, 50, 'score : 0', { fontSize: '32px', color:'000000',stroke: '#ffffff', strokeThickness: 8 });
         
         
 
@@ -97,6 +99,9 @@ export class Game extends Scene {
         {
             this.scene.start('GameOver');
         }
+        CONSTANTS.SCORE = -Math.floor(this.camera.scrollY/(CONSTANTS.TERRAIN_TILE_SIZE*3))*10;
+        this.scoreText.setText('Score: ' + CONSTANTS.SCORE);
+        this.scoreText.setPosition(50,this.camera.scrollY+50);
     }
 
 
