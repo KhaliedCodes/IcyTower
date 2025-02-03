@@ -31,7 +31,7 @@ export class Preloader extends Scene {
 
         this.load.image('logo', 'logo.png');
         this.load.spritesheet(CONSTANTS.PLATFORM, CONSTANTS.PLATFORM_TEXTURE_PATH, { frameWidth: CONSTANTS.TERRAIN_TILE_SIZE, frameHeight: CONSTANTS.TERRAIN_TILE_SIZE });
-
+        this.load.spritesheet(CONSTANTS.PLAYER, CONSTANTS.PLAYER_TEXTURE_PATH, { frameWidth: CONSTANTS.PLAYER_TILE_SIZE, frameHeight: CONSTANTS.PLAYER_TILE_SIZE });
     }
 
     create() {
