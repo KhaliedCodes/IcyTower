@@ -44,15 +44,25 @@ export class Preloader extends Scene {
         this.load.audio(CONSTANTS.DEBRIS_HIT_AUDIO, CONSTANTS.DEBRIS_HIT_AUDIO_TEXTURE_PATH);
         this.load.audio(CONSTANTS.ENEMY_HIT_AUDIO, CONSTANTS.ENEMY_HIT_AUDIO_TEXTURE_PATH);
         this.load.audio(CONSTANTS.PLAYER_JUMP_AUDIO, CONSTANTS.PLAYER_JUMP_AUDIO_TEXTURE_PATH);
-        this.load.audio(CONSTANTS.PLAYER_RUN_AUDIO, CONSTANTS.PLAYER_RUN_AUDIO_TEXTURE_PATH);
-        this.load.audio(CONSTANTS.GAME_OVER_AUDIO, CONSTANTS.GAME_OVER_AUDIO_TEXTURE_PATH);
+        this.load.audio(CONSTANTS.PLAYER_RUN_AUDIO, CONSTANTS.PLAYER_RUN_AUDIO_TEXTURE_PATH); 
+        this.load.audio(CONSTANTS.GAME_OVER_AUDIO, CONSTANTS.GAME_OVER_AUDIO_TEXTURE_PATH);  
+        this.load.image(CONSTANTS.POWER_UP, CONSTANTS.POWER_UP_TEXTURE_PATH);        
+        
     }
 
     create() {
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
         //  For example, you can define global animations here, so we can use them in other scenes.
 
+        // this.anims.create({
+        //     key: 'powerUpAnimation',
+        //     frames: this.anims.generateFrameNumbers(CONSTANTS.POWER_UP_SPRITESHEET, { start: 0, end: 5 }),
+        //     frameRate: 5,  // Reduce frame rate from 8 to 5
+        //     repeat: -1
+        // });        
+
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('MainMenu');
+        
     }
 }

@@ -7,18 +7,23 @@ import { Player } from '../objects/Player';
 import { Ground } from '../objects/ground';
 import { UnstablePlatform } from '../objects/unstablePlatform';
 import { Enemy } from '../objects/enemy';
+import { PowerUp } from '../objects/powerup';
 
 export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
     background: Phaser.GameObjects.Image;
     msg_text: Phaser.GameObjects.Text;
+    powerUps!: Phaser.Physics.Arcade.Group;  // Group to manage multiple power-ups
+    debrisManager: Debris;
     platformSpawnHeight: number = CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE*4;
     player:Player;
     platforms: (Platform | UnstablePlatform)[] = [];
-    debrisManager: Debris;
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
     escKey!: Phaser.Input.Keyboard.Key;
-    
+    powerUp!: PowerUp;
+    hasDoubleJump: boolean = false;
+    canDoubleJump: boolean = false;
+    lastPowerUpHeight: number = 0;
 
     enemies: Enemy[] = [];
     scoreText: Phaser.GameObjects.Text;
@@ -64,7 +69,12 @@ export class Game extends Scene {
         this.cursor = this.input?.keyboard?.createCursorKeys();
         this.scoreText = this.add.text(50, 50, 'score : 0', { fontSize: '32px', color:'000000',stroke: '#ffffff', strokeThickness: 8 });
         
-        
+        this.powerUps = this.physics.add.group();
+
+        // Add a single overlap for the group instead of individual power-ups
+        this.physics.add.overlap(this.player.player, this.powerUps, this.collectPowerUp as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
+
+        this.spawnPowerUp();
 
 
 
@@ -104,27 +114,60 @@ export class Game extends Scene {
             this.player.player.setVelocityX(0);
         }
         
+        if (this.cursor?.up && Phaser.Input.Keyboard.JustDown(this.cursor.up)) {
+            if (this.player.player.body?.touching.down) {
+                // First Jump from Ground
+                this.player.player.setVelocityY(-330);
+                this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+        
+                // Allow double jump if the power-up has been collected
+                if (this.hasDoubleJump) {
+                    this.canDoubleJump = true;  // Enable double jump after first jump
+                }
+        
+                // Reset Coyote Time & Jump Buffer on a normal jump
+                this.coyoteTime = 0;
+                this.jumpBuffer = 0;
+            } 
+            else if (this.coyoteTime > 0) {
+                // Coyote Time Jump (allows jump just after leaving the ground)
+                this.player.player.setVelocityY(-330);
+                this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+                this.coyoteTime = 0;
+                this.jumpBuffer = 0;
+            } 
+            else if (this.canDoubleJump) {
+                // Double Jump Mid-Air
+                this.player.player.setVelocityY(-230);
+                this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+                this.canDoubleJump = false;  // Disable double jump after using it
+            } 
+            else {
+                // Store jump input in Jump Buffer
+                this.jumpBuffer = this.jumpBufferMax;
+            }
+        }
+        
+        // Reset double jump when player lands
+        if (this.player.player.body?.touching.down && this.hasDoubleJump) {
+            this.canDoubleJump = true;
+        }
+        
         // Coyote Time (Jump allowed slightly after falling)
         if (this.player.player.body?.touching.down) {
             this.coyoteTime = this.coyoteTimeMax; // Reset when grounded
         } else {
             this.coyoteTime -= delta; // Decrease when in air
         }
-
-        // Jump Buffer (Store input slightly before landing)
-        if (this.cursor?.up.isDown || this.cursor?.space.isDown) {
-            this.jumpBuffer = this.jumpBufferMax;
-        } else {
-            this.jumpBuffer -= delta;
-        }
-
-        // Jumping (Only if within coyote time OR just touched the ground)
+        
+        // Jump Buffer (Allow late jumps just before landing)
         if (this.jumpBuffer > 0 && this.coyoteTime > 0) {
             this.player.player.setVelocityY(-330);
             this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
             this.jumpBuffer = 0; // Reset buffer after jump
             this.coyoteTime = 0; // Reset coyote time
         }
+        
 
         if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
             window.location.reload();
@@ -161,6 +204,11 @@ export class Game extends Scene {
         this.scoreText.setText('Score: ' + CONSTANTS.SCORE);
         this.scoreText.setPosition(50,this.camera.scrollY+50);
         this.enemies.forEach(enemy => enemy.update());
+
+        if (this.player.player.y < this.lastPowerUpHeight - CONSTANTS.TERRAIN_TILE_SIZE * 6) {
+            this.spawnPowerUp();
+            this.lastPowerUpHeight = this.player.player.y;
+        }
         this.background.setPosition(0,this.camera.scrollY);
     }
 
@@ -253,4 +301,28 @@ export class Game extends Scene {
             }
         });
     }
+
+    spawnPowerUp() {
+        const spawnChance = Phaser.Math.Between(1, 5);
+
+        if (spawnChance === 3) {
+            const randomPlatform = Phaser.Utils.Array.GetRandom(this.platforms);
+            const platformSprite = randomPlatform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;
+            const platformX = platformSprite.x;
+            const platformY = platformSprite.y - 50;
+    
+            // Create the power-up without playing any animation
+            const powerUp = new PowerUp(this, platformX, platformY);
+            this.powerUps.add(powerUp);  // Add to the power-up group
+    
+            // Add collision with platform
+            this.physics.add.collider(powerUp, randomPlatform.platform);
+        }
+    }    
+      
+    
+    collectPowerUp(player: Phaser.Physics.Arcade.Sprite, powerUp: Phaser.Physics.Arcade.Sprite) {
+        this.hasDoubleJump = true;  // Enable double jump
+        powerUp.destroy();  // Remove the power-up from the scene
+    }    
 }
