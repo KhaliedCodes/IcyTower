@@ -5,7 +5,12 @@ export const CONSTANTS = {
     PLAYER_TILE_SIZE: 32,
     PLATFORM: 'platform',
     PLATFORM_TEXTURE_PATH: 'Platforms/Terrain.png',
-    PLAYER: 'player',
-    PLAYER_TEXTURE_PATH: 'Character/Ninja_Frog/Idle.png'
-
+    PLAYER_IDLE: 'playerIdle',
+    PLAYER_RUN: 'playerRun',
+    PLAYER_JUMP: 'playerJump',
+    PLAYER_FALL: 'playerFall',
+    PLAYER_IDLE_TEXTURE_PATH: 'Character/Ninja_Frog/Idle.png',
+    PLAYER_RUN_TEXTURE_PATH: 'Character/Ninja_Frog/Run.png',
+    PLAYER_JUMP_TEXTURE_PATH: 'Character/Ninja_Frog/Jump.png',
+    PLAYER_FALL_TEXTURE_PATH: 'Character/Ninja_Frog/Fall.png',
 }
