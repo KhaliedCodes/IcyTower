@@ -34,8 +34,8 @@ export class Game extends Scene {
 
     create() {
         this.camera = this.cameras.main;
-        const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
-        bg.setDisplaySize(this.scale.width, this.scale.height);
+        this.background = this.add.image(0, 0, 'background').setOrigin(0, 0);
+        this.background.setDisplaySize(this.scale.width, this.scale.height);
         this.spawnPlayer();
         let ground = new Ground(this, 0, CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE, CONSTANTS.PLATFORM, 2);
         this.platforms.push(ground);
@@ -52,7 +52,7 @@ export class Game extends Scene {
             delay: 2000,
             callback: () => {
                 const x = Phaser.Math.Between(100, CONSTANTS.WINDOW_WIDTH - 100);
-                const y = 0;  // Spawn at the top of the screen
+                const y = this.camera.scrollY;  // Spawn at the top of the screen
                 this.debrisManager.spawnDebris(this, x, y);
                 this.physics.add.collider(this.player.player, this.debrisManager.debrisGroup, () => {
                     const debrisHitPlayer = this.sound.add(CONSTANTS.DEBRIS_HIT_AUDIO);
@@ -76,18 +76,7 @@ export class Game extends Scene {
 
         this.spawnEnemies();  // Spawn enemies after platforms are created
 
-        this.enemies.forEach(enemy => {
-            if (enemy.enemy) {
-                this.platforms.forEach(platform => {
-                    this.physics.add.collider(enemy.enemy!, platform.platform);
-                });
-            }
-            this.physics.add.collider(this.player.player, enemy.enemy!, () => {
-                const enemyHitPlayer = this.sound.add(CONSTANTS.ENEMY_HIT_AUDIO);
-                enemyHitPlayer.play();
-                this.scene.start('GameOver');
-            });
-        });
+        
     }
 
     update(time: number, delta: number): void {
@@ -162,6 +151,7 @@ export class Game extends Scene {
         if (this.camera.scrollY - CONSTANTS.TERRAIN_TILE_SIZE*2 < this.platformSpawnHeight)
         {
             this.spawnPlatforms();
+            this.spawnEnemies();
         }
 
         if(-this.camera.scrollY+(this.player.player.body?.position.y??0)>CONSTANTS.WINDOW_HEIGHT)
@@ -177,6 +167,7 @@ export class Game extends Scene {
             this.spawnPowerUp();
             this.lastPowerUpHeight = this.player.player.y;
         }
+        this.background.setPosition(0,this.camera.scrollY);
     }
 
 
@@ -251,17 +242,27 @@ export class Game extends Scene {
 
     spawnEnemies() {
         this.platforms.forEach(platform => {
-            if (Math.random() < 0.2) {
+            if (Math.random() < 0.2&&(this.platformSpawnHeight > (platform.platform.getChildren()[0].body?.position.y??0)-CONSTANTS.TERRAIN_TILE_SIZE*6)) {
                 const platformTile = platform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;
                 const enemy = new Enemy(this, platformTile.x, platformTile.y - CONSTANTS.TERRAIN_TILE_SIZE);
                 this.enemies.push(enemy);
+                if (enemy.enemy) {
+                    this.platforms.forEach(platform => {
+                        this.physics.add.collider(enemy.enemy!, platform.platform);
+                    });
+                }
+                this.physics.add.collider(this.player.player, enemy.enemy!, () => {
+                    const enemyHitPlayer = this.sound.add(CONSTANTS.ENEMY_HIT_AUDIO);
+                    enemyHitPlayer.play();
+                    this.scene.start('GameOver');
+                });
             }
         });
     }
 
     spawnPowerUp() {
         const spawnChance = Phaser.Math.Between(1, 5);
-                
+
         if (spawnChance === 3) {
             const randomPlatform = Phaser.Utils.Array.GetRandom(this.platforms);
             const platformSprite = randomPlatform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;

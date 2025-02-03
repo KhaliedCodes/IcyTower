@@ -9,7 +9,7 @@ export class Enemy {
         this.enemy = scene.physics.add.sprite(x, y, CONSTANTS.ENEMY);
         this.enemy.setGravityY(0);      // Disable vertical gravity
         this.enemy.setVelocityX(100);   // Move horizontally
-        this.enemy.setCollideWorldBounds(true);        
+        //this.enemy.setCollideWorldBounds(true);        
         this.enemy.setBounce(1, 0);    // Only bounce horizontally
 
         // Play saw animation
