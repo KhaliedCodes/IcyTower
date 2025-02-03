@@ -1,17 +1,30 @@
 import { Scene, GameObjects } from 'phaser';
+import { CONSTANTS } from '../constants';
 
 export class MainMenu extends Scene {
     background: GameObjects.Image;
     logo: GameObjects.Image;
     title: GameObjects.Text;
     startButton: GameObjects.Text;
-    optionsButton: GameObjects.Text;
+    exitButton: GameObjects.Text;
+
+    music: {
+        bgMusic: Phaser.Sound.BaseSound,
+    };
 
     constructor() {
         super('MainMenu');
     }
 
     create() {
+        let bgMusic = this.sound.get(CONSTANTS.BG_MUSIC_AUDIO);
+
+        if (!bgMusic) {
+            bgMusic = this.sound.add(CONSTANTS.BG_MUSIC_AUDIO, { loop: true, volume: 0.5 });
+            bgMusic.play();
+        } else if (!bgMusic.isPlaying) {
+            bgMusic.play();
+        }
         const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
         bg.setDisplaySize(this.scale.width, this.scale.height);
 
@@ -31,20 +44,23 @@ export class MainMenu extends Scene {
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         this.startButton.on('pointerdown', () => {
+            const buttonClicked = this.sound.add(CONSTANTS.BUTTON_AUDIO);
+            buttonClicked.play();
             this.scene.start('Game');
         });
-
-        this.optionsButton = this.add.text(this.scale.width / 2, 700, 'Settings', {
+        
+        
+        this.exitButton = this.add.text(this.scale.width / 2, 700, 'Exit', {
             fontFamily: 'Verdana', fontSize: 36, color: '#ffffff',
             backgroundColor: '#005500', padding: { x: 30, y: 15 },
             align: 'center'
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        this.optionsButton.on('pointerdown', () => {
-            this.scene.start('Options');
+        this.exitButton.on('pointerdown', () => {
+            window.close();
         });
 
-        [this.startButton, this.optionsButton].forEach(button => {
+        [this.startButton, this.exitButton].forEach(button => {
             button.on('pointerover', () => button.setStyle({ backgroundColor: '#009900' }));
             button.on('pointerout', () => button.setStyle({ backgroundColor: button === this.startButton ? '#007700' : '#005500' }));
         });
