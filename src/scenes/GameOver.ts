@@ -46,7 +46,6 @@ export class GameOver extends Scene
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
         this.mainButton.on('pointerdown', () => {
-            this.scene.start('MainMenu');
             window.location.reload();
         });
         
