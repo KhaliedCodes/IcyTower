@@ -62,7 +62,7 @@ export class Game extends Scene {
             this.player.player.setVelocityX(0);
         }
         
-        if (this.cursor?.up.isDown && this.player.player.body?.touching.down)
+        if ((this.cursor?.up.isDown || this.cursor?.space.isDown) && this.player.player.body?.touching.down)
         {
             this.player.player.setVelocityY(-330);
             this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
