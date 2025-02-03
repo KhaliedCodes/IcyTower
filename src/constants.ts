@@ -31,4 +31,6 @@ export const CONSTANTS = {
     PLAYER_RUN_TEXTURE_PATH: 'Character/Ninja_Frog/Run.png',
     PLAYER_JUMP_TEXTURE_PATH: 'Character/Ninja_Frog/Jump.png',
     PLAYER_FALL_TEXTURE_PATH: 'Character/Ninja_Frog/Fall.png',
+    POWER_UP: 'powerUp',
+    POWER_UP_TEXTURE_PATH: 'Platforms/Spiked Ball/Chain.png',
 }

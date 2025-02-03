@@ -6,17 +6,22 @@ import { Debris } from '../objects/debris';
 import { Player } from '../objects/Player';
 import { Ground } from '../objects/ground';
 import { Enemy } from '../objects/enemy';
+import { PowerUp } from '../objects/powerup';
 
 export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
     background: Phaser.GameObjects.Image;
     msg_text: Phaser.GameObjects.Text;
+    powerUps!: Phaser.Physics.Arcade.Group;  // Group to manage multiple power-ups
     platformSpawnHeight: number = CONSTANTS.TERRAIN_TILE_SIZE * 4;
     debrisManager: Debris;
     player:Player;
     platforms: Platform[] = [];
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
     escKey!: Phaser.Input.Keyboard.Key;
+    powerUp!: PowerUp;
+    hasDoubleJump: boolean = false;
+    canDoubleJump: boolean = false;
 
     enemies: Enemy[] = [];
 
@@ -56,7 +61,12 @@ export class Game extends Scene {
         });
         this.cursor = this.input?.keyboard?.createCursorKeys();
         
-        
+        this.powerUps = this.physics.add.group();
+
+        // Add a single overlap for the group instead of individual power-ups
+        this.physics.add.overlap(this.player.player, this.powerUps, this.collectPowerUp as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
+
+        this.spawnPowerUp();
 
         this.spawnEnemies();  // Spawn enemies after platforms are created
         
@@ -102,11 +112,28 @@ export class Game extends Scene {
             this.player.player.setVelocityX(0);
         }
         
-        if (this.cursor?.up.isDown && this.player.player.body?.touching.down)
-        {
-            this.player.player.setVelocityY(-330);
-            this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+        if (this.cursor?.up && Phaser.Input.Keyboard.JustDown(this.cursor.up)) {
+            if (this.player.player.body?.touching.down) {
+                // First Jump from Ground
+                this.player.player.setVelocityY(-330);
+                this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+        
+                // Allow double jump if the power-up has been collected
+                if (this.hasDoubleJump) {
+                    this.canDoubleJump = true;  // Enable double jump after first jump
+                }
+            } else if (this.canDoubleJump) {
+                // Double Jump Mid-Air
+                this.player.player.setVelocityY(-230);
+                this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+                this.canDoubleJump = false;  // Disable double jump after using it
+            }
         }
+        
+        if (this.player.player.body?.touching.down && this.hasDoubleJump) {
+            this.canDoubleJump = true;  // Reset double jump when the player lands
+        }
+        
 
         if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
             window.location.reload();
@@ -159,4 +186,29 @@ export class Game extends Scene {
             }
         });
     }
+
+    spawnPowerUp() {
+        const spawnChance = Phaser.Math.Between(1, 10);
+        
+        // if (spawnChance === 3) {
+        if(true){
+            const randomPlatform = Phaser.Utils.Array.GetRandom(this.platforms);
+            const platformSprite = randomPlatform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;
+            const platformX = platformSprite.x;
+            const platformY = platformSprite.y - 50;
+    
+            // Create the power-up without playing any animation
+            const powerUp = new PowerUp(this, platformX, platformY);
+            this.powerUps.add(powerUp);  // Add to the power-up group
+    
+            // Add collision with platform
+            this.physics.add.collider(powerUp, randomPlatform.platform);
+        }
+    }    
+      
+    
+    collectPowerUp(player: Phaser.Physics.Arcade.Sprite, powerUp: Phaser.Physics.Arcade.Sprite) {
+        this.hasDoubleJump = true;  // Enable double jump
+        powerUp.destroy();  // Remove the power-up from the scene
+    }    
 }
