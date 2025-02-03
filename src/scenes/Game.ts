@@ -114,7 +114,7 @@ export class Game extends Scene {
             this.player.player.setVelocityX(0);
         }
         
-        if (this.cursor?.up && Phaser.Input.Keyboard.JustDown(this.cursor.up)) {
+        if ((this.cursor?.up && Phaser.Input.Keyboard.JustDown(this.cursor.up)) || (this.cursor?.space && Phaser.Input.Keyboard.JustDown(this.cursor.space))) {
             if (this.player.player.body?.touching.down) {
                 // First Jump from Ground
                 this.player.player.setVelocityY(-330);
@@ -135,6 +135,9 @@ export class Game extends Scene {
                 this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
                 this.coyoteTime = 0;
                 this.jumpBuffer = 0;
+                if (this.hasDoubleJump) {
+                    this.canDoubleJump = true;  // Enable double jump after first jump
+                }
             } 
             else if (this.canDoubleJump) {
                 // Double Jump Mid-Air
@@ -146,6 +149,10 @@ export class Game extends Scene {
                 // Store jump input in Jump Buffer
                 this.jumpBuffer = this.jumpBufferMax;
             }
+        }
+        else
+        {
+            this.jumpBuffer -= delta;
         }
         
         // Reset double jump when player lands
