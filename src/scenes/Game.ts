@@ -23,6 +23,7 @@ export class Game extends Scene {
     powerUp!: PowerUp;
     hasDoubleJump: boolean = false;
     canDoubleJump: boolean = false;
+    lastPowerUpHeight: number = 0;
 
     enemies: Enemy[] = [];
     scoreText: Phaser.GameObjects.Text;
@@ -171,6 +172,11 @@ export class Game extends Scene {
         this.scoreText.setText('Score: ' + CONSTANTS.SCORE);
         this.scoreText.setPosition(50,this.camera.scrollY+50);
         this.enemies.forEach(enemy => enemy.update());
+
+        if (this.player.player.y < this.lastPowerUpHeight - CONSTANTS.TERRAIN_TILE_SIZE * 6) {
+            this.spawnPowerUp();
+            this.lastPowerUpHeight = this.player.player.y;
+        }
     }
 
 
@@ -254,10 +260,9 @@ export class Game extends Scene {
     }
 
     spawnPowerUp() {
-        const spawnChance = Phaser.Math.Between(1, 10);
-        
-        // if (spawnChance === 3) {
-        if(true){
+        const spawnChance = Phaser.Math.Between(1, 5);
+                
+        if (spawnChance === 3) {
             const randomPlatform = Phaser.Utils.Array.GetRandom(this.platforms);
             const platformSprite = randomPlatform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;
             const platformX = platformSprite.x;
