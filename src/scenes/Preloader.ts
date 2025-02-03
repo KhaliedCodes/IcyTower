@@ -31,6 +31,7 @@ export class Preloader extends Scene {
 
         this.load.image('logo', 'logo.png');
         this.load.spritesheet(CONSTANTS.PLATFORM, CONSTANTS.PLATFORM_TEXTURE_PATH, { frameWidth: CONSTANTS.TERRAIN_TILE_SIZE, frameHeight: CONSTANTS.TERRAIN_TILE_SIZE });
+        this.load.spritesheet(CONSTANTS.ENEMY, CONSTANTS.ENEMY_TEXTURE_PATH, { frameWidth: 38, frameHeight: 38 });
 
     }
 
