@@ -12,14 +12,15 @@ export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
     background: Phaser.GameObjects.Image;
     msg_text: Phaser.GameObjects.Text;
-    platformSpawnHeight: number = CONSTANTS.TERRAIN_TILE_SIZE * 4;
-    player: Player;
+    platformSpawnHeight: number = CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE*4;
+    player:Player;
     platforms: (Platform | UnstablePlatform)[] = [];
     debrisManager: Debris;
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
     escKey!: Phaser.Input.Keyboard.Key;
 
     enemies: Enemy[] = [];
+    scoreText: Phaser.GameObjects.Text;
 
     constructor() {
         super('Game');
@@ -56,6 +57,9 @@ export class Game extends Scene {
             loop: true
         });
         this.cursor = this.input?.keyboard?.createCursorKeys();
+        this.scoreText = this.add.text(50, 50, 'score : 0', { fontSize: '32px', color:'000000',stroke: '#ffffff', strokeThickness: 8 });
+        
+        
 
 
 
@@ -99,8 +103,9 @@ export class Game extends Scene {
             // }
             this.player.player.setVelocityX(0);
         }
-
-        if (this.cursor?.up.isDown && this.player.player.body?.touching.down) {
+        
+        if ((this.cursor?.up.isDown || this.cursor?.space.isDown) && this.player.player.body?.touching.down)
+        {
             this.player.player.setVelocityY(-330);
             this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
         }
@@ -121,6 +126,23 @@ export class Game extends Scene {
             this.player.player.anims.play(CONSTANTS.PLAYER_IDLE, true);
         }
 
+        if (CONSTANTS.WINDOW_HEIGHT-CONSTANTS.TERRAIN_TILE_SIZE*5-(this.player.player.body?.position.y??0)>-this.camera.scrollY)
+        {
+            this.camera.scrollY = -CONSTANTS.WINDOW_HEIGHT+CONSTANTS.TERRAIN_TILE_SIZE*5+(this.player.player.body?.position.y??0);
+        }
+
+        if (this.camera.scrollY - CONSTANTS.TERRAIN_TILE_SIZE*2 < this.platformSpawnHeight)
+        {
+            this.spawnPlatforms();
+        }
+
+        if(-this.camera.scrollY+(this.player.player.body?.position.y??0)>CONSTANTS.WINDOW_HEIGHT)
+        {
+            this.scene.start('GameOver');
+        }
+        CONSTANTS.SCORE = -Math.floor(this.camera.scrollY/(CONSTANTS.TERRAIN_TILE_SIZE*3))*10;
+        this.scoreText.setText('Score: ' + CONSTANTS.SCORE);
+        this.scoreText.setPosition(50,this.camera.scrollY+50);
         this.enemies.forEach(enemy => enemy.update());
     }
 
@@ -187,7 +209,7 @@ export class Game extends Scene {
 
 
         });
-        this.platformSpawnHeight += CONSTANTS.TERRAIN_TILE_SIZE * 3;
+        this.platformSpawnHeight -= CONSTANTS.TERRAIN_TILE_SIZE * 3;
     }
     spawnPlayer() {
         this.player = new Player(this, CONSTANTS.WINDOW_WIDTH / 2, CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE * 2, CONSTANTS.PLAYER_IDLE);
