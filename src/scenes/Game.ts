@@ -41,6 +41,9 @@ export class Game extends Scene {
                 const x = Phaser.Math.Between(100, CONSTANTS.WINDOW_WIDTH - 100);
                 const y = 0;  // Spawn at the top of the screen
                 this.debrisManager.spawnDebris(this, x, y);
+                this.physics.add.collider(this.player.player, this.debrisManager.debrisGroup, () => {
+                    this.scene.start('GameOver');
+                });
             },
             loop: true
         });
