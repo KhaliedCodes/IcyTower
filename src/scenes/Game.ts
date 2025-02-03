@@ -18,9 +18,14 @@ export class Game extends Scene {
     debrisManager: Debris;
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
     escKey!: Phaser.Input.Keyboard.Key;
+    
 
     enemies: Enemy[] = [];
     scoreText: Phaser.GameObjects.Text;
+    coyoteTime: number = 0;
+    coyoteTimeMax: number = 200;
+    jumpBuffer: number = 0;
+    jumpBufferMax: number = 200;
 
     constructor() {
         super('Game');
@@ -99,10 +104,26 @@ export class Game extends Scene {
             this.player.player.setVelocityX(0);
         }
         
-        if ((this.cursor?.up.isDown || this.cursor?.space.isDown) && this.player.player.body?.touching.down)
-        {
+        // Coyote Time (Jump allowed slightly after falling)
+        if (this.player.player.body?.touching.down) {
+            this.coyoteTime = this.coyoteTimeMax; // Reset when grounded
+        } else {
+            this.coyoteTime -= delta; // Decrease when in air
+        }
+
+        // Jump Buffer (Store input slightly before landing)
+        if (this.cursor?.up.isDown || this.cursor?.space.isDown) {
+            this.jumpBuffer = this.jumpBufferMax;
+        } else {
+            this.jumpBuffer -= delta;
+        }
+
+        // Jumping (Only if within coyote time OR just touched the ground)
+        if (this.jumpBuffer > 0 && this.coyoteTime > 0) {
             this.player.player.setVelocityY(-330);
             this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+            this.jumpBuffer = 0; // Reset buffer after jump
+            this.coyoteTime = 0; // Reset coyote time
         }
 
         if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
