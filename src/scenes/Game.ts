@@ -82,6 +82,8 @@ export class Game extends Scene {
         {
             this.player.player.anims.play(CONSTANTS.PLAYER_IDLE, true);
         }
+        
+        this.camera.setPosition(0,Math.max(CONSTANTS.WINDOW_HEIGHT-CONSTANTS.TERRAIN_TILE_SIZE*3-(this.player.player.body?.position.y??0),this.camera.centerY-this.camera.height/2));
             
     }
 
