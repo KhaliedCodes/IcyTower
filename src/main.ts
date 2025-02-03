@@ -3,6 +3,7 @@ import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
+import { Options } from './scenes/Options';
 import { CONSTANTS } from './constants';
 
 import { Game, Types } from "phaser";
@@ -21,7 +22,7 @@ const config: Types.Core.GameConfig = {
         default: 'arcade',
         arcade: {
             gravity: { x: 0, y: 300 },
-            debug: false
+            debug: true
         }
     },
     scene: [
@@ -29,7 +30,8 @@ const config: Types.Core.GameConfig = {
         Preloader,
         MainMenu,
         MainGame,
-        GameOver
+        GameOver,
+        Options
     ]
 };
 
