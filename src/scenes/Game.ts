@@ -44,12 +44,9 @@ export class Game extends Scene {
                     this.physics.add.collider(enemy.enemy!, platform.platform);
                 });
             }
-        });
-
-        this.input.once('pointerdown', () => {
-
-            // this.scene.start('GameOver');
-
+            this.physics.add.collider(this.player.player, enemy.enemy!, () => {
+                this.scene.start('GameOver');
+            });
         });
     }
 
