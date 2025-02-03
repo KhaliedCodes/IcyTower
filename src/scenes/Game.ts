@@ -2,12 +2,14 @@ import { Scene } from 'phaser';
 import { Platform } from '../objects/platform';
 import { Utils } from '../utils/utils';
 import { CONSTANTS } from '../constants';
+import { Debris } from '../objects/debris';
 
 export class Game extends Scene {
     camera: Phaser.Cameras.Scene2D.Camera;
     background: Phaser.GameObjects.Image;
     msg_text: Phaser.GameObjects.Text;
     platformSpawnHeight: number = CONSTANTS.TERRAIN_TILE_SIZE * 4;
+    debrisManager: Debris;
 
     constructor() {
         super('Game');
@@ -20,8 +22,16 @@ export class Game extends Scene {
         this.spawnPlatforms();
         this.spawnPlatforms();
         this.spawnPlatforms();
-
-
+        this.debrisManager = new Debris(this);
+        this.time.addEvent({
+            delay: 2000,
+            callback: () => {
+                const x = Phaser.Math.Between(100, CONSTANTS.WINDOW_WIDTH - 100);
+                const y = 0;  // Spawn at the top of the screen
+                this.debrisManager.spawnDebris(this, x, y);
+            },
+            loop: true
+        });
 
 
 
