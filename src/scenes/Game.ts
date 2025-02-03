@@ -15,8 +15,8 @@ export class Game extends Scene {
     msg_text: Phaser.GameObjects.Text;
     powerUps!: Phaser.Physics.Arcade.Group;  // Group to manage multiple power-ups
     debrisManager: Debris;
-    platformSpawnHeight: number = CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE*4;
-    player:Player;
+    platformSpawnHeight: number = CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE * 4;
+    player: Player;
     platforms: (Platform | UnstablePlatform)[] = [];
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
     escKey!: Phaser.Input.Keyboard.Key;
@@ -67,8 +67,8 @@ export class Game extends Scene {
             loop: true
         });
         this.cursor = this.input?.keyboard?.createCursorKeys();
-        this.scoreText = this.add.text(50, 50, 'score : 0', { fontSize: '32px', color:'000000',stroke: '#ffffff', strokeThickness: 8 });
-        
+        this.scoreText = this.add.text(50, 50, 'score : 0', { fontSize: '32px', color: '000000', stroke: '#ffffff', strokeThickness: 8 });
+
         this.powerUps = this.physics.add.group();
 
         // Add a single overlap for the group instead of individual power-ups
@@ -80,15 +80,15 @@ export class Game extends Scene {
 
         this.spawnEnemies();  // Spawn enemies after platforms are created
 
-        
+
     }
-    
+
     update(time: number, delta: number): void {
-        if ((this.player.player.body?.position.x??0)<0){
-            this.player.player.setX(0+CONSTANTS.PLAYER_TILE_SIZE/2);
+        if ((this.player.player.body?.position.x ?? 0) < 0) {
+            this.player.player.setX(0 + CONSTANTS.PLAYER_TILE_SIZE / 2);
         }
-        if ((this.player.player.body?.position.x??0)>CONSTANTS.WINDOW_WIDTH-CONSTANTS.PLAYER_TILE_SIZE){
-            this.player.player.setX(CONSTANTS.WINDOW_WIDTH-CONSTANTS.PLAYER_TILE_SIZE/2);
+        if ((this.player.player.body?.position.x ?? 0) > CONSTANTS.WINDOW_WIDTH - CONSTANTS.PLAYER_TILE_SIZE) {
+            this.player.player.setX(CONSTANTS.WINDOW_WIDTH - CONSTANTS.PLAYER_TILE_SIZE / 2);
         }
         // const playerRunning = this.sound.add(CONSTANTS.PLAYER_RUN_AUDIO);
         if (this.cursor?.left.isDown) {
@@ -113,22 +113,22 @@ export class Game extends Scene {
             // }
             this.player.player.setVelocityX(0);
         }
-        
+
         if ((this.cursor?.up && Phaser.Input.Keyboard.JustDown(this.cursor.up)) || (this.cursor?.space && Phaser.Input.Keyboard.JustDown(this.cursor.space))) {
             if (this.player.player.body?.touching.down) {
                 // First Jump from Ground
                 this.player.player.setVelocityY(-330);
                 this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
-        
+
                 // Allow double jump if the power-up has been collected
                 if (this.hasDoubleJump) {
                     this.canDoubleJump = true;  // Enable double jump after first jump
                 }
-        
+
                 // Reset Coyote Time & Jump Buffer on a normal jump
                 this.coyoteTime = 0;
                 this.jumpBuffer = 0;
-            } 
+            }
             else if (this.coyoteTime > 0) {
                 // Coyote Time Jump (allows jump just after leaving the ground)
                 this.player.player.setVelocityY(-330);
@@ -138,35 +138,34 @@ export class Game extends Scene {
                 if (this.hasDoubleJump) {
                     this.canDoubleJump = true;  // Enable double jump after first jump
                 }
-            } 
+            }
             else if (this.canDoubleJump) {
                 // Double Jump Mid-Air
                 this.player.player.setVelocityY(-230);
                 this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
                 this.canDoubleJump = false;  // Disable double jump after using it
-            } 
+            }
             else {
                 // Store jump input in Jump Buffer
                 this.jumpBuffer = this.jumpBufferMax;
             }
         }
-        else
-        {
+        else {
             this.jumpBuffer -= delta;
         }
-        
+
         // Reset double jump when player lands
         if (this.player.player.body?.touching.down && this.hasDoubleJump) {
             this.canDoubleJump = true;
         }
-        
+
         // Coyote Time (Jump allowed slightly after falling)
         if (this.player.player.body?.touching.down) {
             this.coyoteTime = this.coyoteTimeMax; // Reset when grounded
         } else {
             this.coyoteTime -= delta; // Decrease when in air
         }
-        
+
         // Jump Buffer (Allow late jumps just before landing)
         if (this.jumpBuffer > 0 && this.coyoteTime > 0) {
             this.player.player.setVelocityY(-330);
@@ -174,7 +173,7 @@ export class Game extends Scene {
             this.jumpBuffer = 0; // Reset buffer after jump
             this.coyoteTime = 0; // Reset coyote time
         }
-        
+
 
         if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
             window.location.reload();
@@ -192,31 +191,28 @@ export class Game extends Scene {
             this.player.player.anims.play(CONSTANTS.PLAYER_IDLE, true);
         }
 
-        if (CONSTANTS.WINDOW_HEIGHT-CONSTANTS.TERRAIN_TILE_SIZE*5-(this.player.player.body?.position.y??0)>-this.camera.scrollY)
-        {
-            this.camera.scrollY = -CONSTANTS.WINDOW_HEIGHT+CONSTANTS.TERRAIN_TILE_SIZE*5+(this.player.player.body?.position.y??0);
+        if (CONSTANTS.WINDOW_HEIGHT - CONSTANTS.TERRAIN_TILE_SIZE * 5 - (this.player.player.body?.position.y ?? 0) > -this.camera.scrollY) {
+            this.camera.scrollY = -CONSTANTS.WINDOW_HEIGHT + CONSTANTS.TERRAIN_TILE_SIZE * 5 + (this.player.player.body?.position.y ?? 0);
         }
 
-        if (this.camera.scrollY - CONSTANTS.TERRAIN_TILE_SIZE*2 < this.platformSpawnHeight)
-        {
+        if (this.camera.scrollY - CONSTANTS.TERRAIN_TILE_SIZE * 2 < this.platformSpawnHeight) {
             this.spawnPlatforms();
             this.spawnEnemies();
         }
 
-        if(-this.camera.scrollY+(this.player.player.body?.position.y??0)>CONSTANTS.WINDOW_HEIGHT)
-        {
+        if (-this.camera.scrollY + (this.player.player.body?.position.y ?? 0) > CONSTANTS.WINDOW_HEIGHT) {
             this.scene.start('GameOver');
         }
-        CONSTANTS.SCORE = -Math.floor(this.camera.scrollY/(CONSTANTS.TERRAIN_TILE_SIZE*3))*10;
+        CONSTANTS.SCORE = -Math.floor(this.camera.scrollY / (CONSTANTS.TERRAIN_TILE_SIZE * 3)) * 10;
         this.scoreText.setText('Score: ' + CONSTANTS.SCORE);
-        this.scoreText.setPosition(50,this.camera.scrollY+50);
+        this.scoreText.setPosition(50, this.camera.scrollY + 50);
         this.enemies.forEach(enemy => enemy.update());
 
         if (this.player.player.y < this.lastPowerUpHeight - CONSTANTS.TERRAIN_TILE_SIZE * 6) {
             this.spawnPowerUp();
             this.lastPowerUpHeight = this.player.player.y;
         }
-        this.background.setPosition(0,this.camera.scrollY);
+        this.background.setPosition(0, this.camera.scrollY);
     }
 
 
@@ -225,7 +221,7 @@ export class Game extends Scene {
         const platform1 = Math.random() < 0.5 ? new Platform(this, platformSpawnX, this.platformSpawnHeight, CONSTANTS.PLATFORM, 2)
             : new UnstablePlatform(this, platformSpawnX, this.platformSpawnHeight, CONSTANTS.UNSTABLE_PLATFORM, 0)
         this.platforms.push(platform1);
-        this.physics.add.collider(this.player.player, platform1.platform, () => {
+        const playform1Collider = this.physics.add.collider(this.player.player, platform1.platform, () => {
             if (platform1 instanceof UnstablePlatform && platform1.isShaking === false) {
                 platform1.isShaking = true;
                 platform1.platform.children.iterate(child => {
@@ -237,11 +233,14 @@ export class Game extends Scene {
                         repeat: 10,
                         yoyo: true,
                         onComplete: () => {
-                            platform1.platform.children.iterate(child => {
-                                (child.body as Phaser.Physics.Arcade.Body).setImmovable(false);
-                                (child.body as Phaser.Physics.Arcade.Body).setVelocityY(300);
-                                return true;
-                            })
+
+                            (child.body as Phaser.Physics.Arcade.Body).setImmovable(false);
+                            (child.body as Phaser.Physics.Arcade.Body).setVelocityY(300);
+                            (child.body as Phaser.Physics.Arcade.Body).setGravityY(300);
+
+                            playform1Collider.active = false;
+
+
                         }
                     });
                     return true;
@@ -257,7 +256,7 @@ export class Game extends Scene {
         const platform2 = Math.random() < 0.5 ? new Platform(this, secondPlatformSpawnX, this.platformSpawnHeight, CONSTANTS.PLATFORM, 2)
             : new UnstablePlatform(this, secondPlatformSpawnX, this.platformSpawnHeight, CONSTANTS.UNSTABLE_PLATFORM, 0)
         this.platforms.push(platform2);
-        this.physics.add.collider(this.player.player, platform2.platform, () => {
+        const playform2Collider = this.physics.add.collider(this.player.player, platform2.platform, () => {
             if (platform2 instanceof UnstablePlatform && platform2.isShaking === false) {
                 platform2.isShaking = true;
                 platform2.platform.children.iterate(child => {
@@ -269,11 +268,13 @@ export class Game extends Scene {
                         repeat: 10,
                         yoyo: true,
                         onComplete: () => {
-                            platform2.platform.children.iterate(child => {
-                                (child.body as Phaser.Physics.Arcade.Body).setImmovable(false);
-                                (child.body as Phaser.Physics.Arcade.Body).setVelocityY(300);
-                                return true;
-                            })
+                            (child.body as Phaser.Physics.Arcade.Body).setImmovable(false);
+                            (child.body as Phaser.Physics.Arcade.Body).setVelocityY(300);
+                            (child.body as Phaser.Physics.Arcade.Body).setGravityY(300);
+
+                            playform2Collider.active = false;
+                            return true;
+
                         }
                     });
                     return true;
@@ -291,7 +292,7 @@ export class Game extends Scene {
 
     spawnEnemies() {
         this.platforms.forEach(platform => {
-            if (Math.random() < 0.2&&(this.platformSpawnHeight > (platform.platform.getChildren()[0].body?.position.y??0)-CONSTANTS.TERRAIN_TILE_SIZE*6)) {
+            if (Math.random() < 0.2 && (this.platformSpawnHeight > (platform.platform.getChildren()[0].body?.position.y ?? 0) - CONSTANTS.TERRAIN_TILE_SIZE * 6)) {
                 const platformTile = platform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;
                 const enemy = new Enemy(this, platformTile.x, platformTile.y - CONSTANTS.TERRAIN_TILE_SIZE);
                 this.enemies.push(enemy);
@@ -317,19 +318,19 @@ export class Game extends Scene {
             const platformSprite = randomPlatform.platform.getChildren()[0] as Phaser.GameObjects.Sprite;
             const platformX = platformSprite.x;
             const platformY = platformSprite.y - 50;
-    
+
             // Create the power-up without playing any animation
             const powerUp = new PowerUp(this, platformX, platformY);
             this.powerUps.add(powerUp);  // Add to the power-up group
-    
+
             // Add collision with platform
             this.physics.add.collider(powerUp, randomPlatform.platform);
         }
-    }    
-      
-    
+    }
+
+
     collectPowerUp(player: Phaser.Physics.Arcade.Sprite, powerUp: Phaser.Physics.Arcade.Sprite) {
         this.hasDoubleJump = true;  // Enable double jump
         powerUp.destroy();  // Remove the power-up from the scene
-    }    
+    }
 }
