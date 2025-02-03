@@ -16,6 +16,7 @@ export class Game extends Scene {
     player:Player;
     platforms: Platform[] = [];
     cursor?: Phaser.Types.Input.Keyboard.CursorKeys;
+    escKey!: Phaser.Input.Keyboard.Key;
 
     enemies: Enemy[] = [];
 
@@ -35,6 +36,9 @@ export class Game extends Scene {
         this.spawnPlatforms();
         this.spawnPlatforms();
         this.debrisManager = new Debris(this);
+        if (this.input.keyboard) {
+            this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        }
         this.time.addEvent({
             delay: 2000,
             callback: () => {
@@ -42,6 +46,8 @@ export class Game extends Scene {
                 const y = 0;  // Spawn at the top of the screen
                 this.debrisManager.spawnDebris(this, x, y);
                 this.physics.add.collider(this.player.player, this.debrisManager.debrisGroup, () => {
+                    const debrisHitPlayer = this.sound.add(CONSTANTS.DEBRIS_HIT_AUDIO);
+                    debrisHitPlayer.play();
                     this.scene.start('GameOver');
                 });
             },
@@ -60,26 +66,38 @@ export class Game extends Scene {
                 });
             }
             this.physics.add.collider(this.player.player, enemy.enemy!, () => {
+                const enemyHitPlayer = this.sound.add(CONSTANTS.ENEMY_HIT_AUDIO);
+                enemyHitPlayer.play();
                 this.scene.start('GameOver');
             });
         });
     }
 
     update(time: number, delta: number): void {
+        // const playerRunning = this.sound.add(CONSTANTS.PLAYER_RUN_AUDIO);
         if (this.cursor?.left.isDown)
         {
+            // if(!playerRunning.isPlaying){
+            //     playerRunning.play();
+            // }
             this.player.player.setVelocityX(-160);
             this.player.player.flipX = true;
             this.player.player.anims.play(CONSTANTS.PLAYER_RUN, true);
         }
         else if (this.cursor?.right.isDown)
         {
+            // if(!playerRunning.isPlaying){
+            //     playerRunning.play();
+            // }
             this.player.player.setVelocityX(160);
             this.player.player.flipX = false;
             this.player.player.anims.play(CONSTANTS.PLAYER_RUN, true);
         }
         else
         {
+            // if(playerRunning.isPlaying){
+            //     playerRunning.play();
+            // }
             this.player.player.setVelocityX(0);
         }
         
@@ -87,6 +105,10 @@ export class Game extends Scene {
         {
             this.player.player.setVelocityY(-330);
             this.player.player.anims.play(CONSTANTS.PLAYER_JUMP, true);
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
+            window.location.reload();
         }
 
         if ((this.player.player.body?.velocity.y ?? 0) > 0)
