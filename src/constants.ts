@@ -4,6 +4,8 @@ export const CONSTANTS = {
     TERRAIN_TILE_SIZE: 48,
     PLAYER_TILE_SIZE: 32,
     PLATFORM: 'platform',
+    UNSTABLE_PLATFORM: 'unstablePlatform',
+    UNSTABLE_PLATFORM_PATH: 'Platforms/UnstableTerrain.png',
     PLATFORM_TEXTURE_PATH: 'Platforms/Terrain.png',
     PLAYER_IDLE: 'playerIdle',
     PLAYER_RUN: 'playerRun',

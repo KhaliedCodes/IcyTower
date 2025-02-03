@@ -9,21 +9,21 @@ export class Preloader extends Scene {
     init() {
         // Add background at the top-left corner
         const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
-    
+
         // Resize the background to fit the entire game window
         bg.setDisplaySize(this.scale.width, this.scale.height);
-    
+
         // A simple progress bar. This is the outline of the bar.
         this.add.rectangle(this.scale.width / 2, this.scale.height / 2, 468, 32).setStrokeStyle(1, 0xffffff);
-    
+
         // This is the progress bar itself.
         const bar = this.add.rectangle(this.scale.width / 2 - 230, this.scale.height / 2, 4, 28, 0xffffff);
-    
+
         // Update the progress bar as assets load
         this.load.on('progress', (progress: number) => {
             bar.width = 4 + (460 * progress);
         });
-    }    
+    }
 
     preload() {
         //  Load the assets for the game - Replace with your own assets
@@ -31,6 +31,7 @@ export class Preloader extends Scene {
 
         this.load.image('logo', 'EcoTowerLogo.png');
         this.load.spritesheet(CONSTANTS.PLATFORM, CONSTANTS.PLATFORM_TEXTURE_PATH, { frameWidth: CONSTANTS.TERRAIN_TILE_SIZE, frameHeight: CONSTANTS.TERRAIN_TILE_SIZE });
+        this.load.spritesheet(CONSTANTS.UNSTABLE_PLATFORM, CONSTANTS.UNSTABLE_PLATFORM_PATH, { frameWidth: CONSTANTS.TERRAIN_TILE_SIZE, frameHeight: CONSTANTS.TERRAIN_TILE_SIZE });
         this.load.spritesheet(CONSTANTS.PLAYER_IDLE, CONSTANTS.PLAYER_IDLE_TEXTURE_PATH, { frameWidth: CONSTANTS.PLAYER_TILE_SIZE, frameHeight: CONSTANTS.PLAYER_TILE_SIZE });
         this.load.spritesheet(CONSTANTS.PLAYER_RUN, CONSTANTS.PLAYER_RUN_TEXTURE_PATH, { frameWidth: CONSTANTS.PLAYER_TILE_SIZE, frameHeight: CONSTANTS.PLAYER_TILE_SIZE });
         this.load.spritesheet(CONSTANTS.PLAYER_JUMP, CONSTANTS.PLAYER_JUMP_TEXTURE_PATH, { frameWidth: CONSTANTS.PLAYER_TILE_SIZE, frameHeight: CONSTANTS.PLAYER_TILE_SIZE });
